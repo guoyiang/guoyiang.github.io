@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: Yiang's Site
 subtitle:
 description:
-author: John Doe
-language:
+author: Yiang Guo
+language: en-CA
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://www.guoyiang.net
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -34,7 +34,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -63,7 +63,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
-theme: landscape
+theme: tranquilpeak
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
@@ -71,3 +71,14 @@ deploy:
   type: git
   repo: git@github.com:guoyiang/guoyiang.github.io.git
   branch: master
+
+feed:
+    type: atom
+    path: atom.xml
+    limit: 20
+
+plugins:
+- hexo-generator-feed
+- hexo-generator-archive
+- hexo-generator-tag
+- hexo-generator-category
