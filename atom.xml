@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Yiang&#39;s Site</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://guoyiang.com/"/>
+  <updated>2016-11-06T04:01:39.066Z</updated>
+  <id>http://guoyiang.com/</id>
+  
+  <author>
+    <name>Yiang Guo</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Build My Own Raspbian Docker Image</title>
+    <link href="http://guoyiang.com/2016/11/04/Build-My-Own-Raspbian-Docker-Image/"/>
+    <id>http://guoyiang.com/2016/11/04/Build-My-Own-Raspbian-Docker-Image/</id>
+    <published>2016-11-04T21:59:58.000Z</published>
+    <updated>2016-11-06T04:01:39.066Z</updated>
+    
+    <content type="html"><![CDATA[<p>It’s great to have Docker on Raspberry Pi, and there’s a <a href="https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/" title="Raspberry Pi&#39;s blog about Docker" target="_blank" rel="external">blog</a> about it.</p>
+<p>But one thing I found is that Raspberry Pi is based on ARM CPU, thus do not support x86/x64 instructions. <strong>Any Docker image build for x86/x64 won’t work</strong>. And, I didn’t find any <strong>official</strong> Docker image built for Raspberry Pi. <a href="https://hub.docker.com/r/resin/rpi-raspbian/" title="resin/rpi-raspbian" target="_blank" rel="external">resin/rpi-raspbian</a> is widely used and also used by <a href="https://github.com/docker/docker/blob/master/contrib/builder/deb/armhf/raspbian-jessie/Dockerfile" title="Resin Docker image used in Docker project" target="_blank" rel="external">Docker</a> project is a good candidate and is lightweitht, but I still want to use an official one. So, I decided to build one myself.<br><a id="more"></a></p>
+<h1 id="Download-Raspbian"><a href="#Download-Raspbian" class="headerlink" title="Download Raspbian"></a>Download Raspbian</h1><p>I have done this already, <a href="https://www.raspberrypi.org/downloads/raspbian/" title="Download Raspbian" target="_blank" rel="external">download</a> and unzip the image. Now I got <code>2016-09-23-raspbian-jessie-lite.img</code>. </p>
+<h1 id="Create-a-tarball-archive-containing-files-from-official-Raspbian"><a href="#Create-a-tarball-archive-containing-files-from-official-Raspbian" class="headerlink" title="Create a tarball archive containing files from official Raspbian"></a>Create a tarball archive containing files from official Raspbian</h1><p><code>2016-09-23-raspbian-jessie-lite.img</code> is an <a href="https://en.wikipedia.org/wiki/IMG_(file_format)" title="IMG file" target="_blank" rel="external">IMG file</a> which contains raw dump of disk, and I can mount it under Linux.</p>
+<h2 id="List-the-partitions-of-the-img"><a href="#List-the-partitions-of-the-img" class="headerlink" title="List the partitions of the img"></a>List the partitions of the img</h2><pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[blah@localhost ~]$ fdisk -l ./2016-09-23-raspbian-jessie-lite.img</div><div class="line"></div><div class="line">Disk ./2016-09-23-raspbian-jessie-lite.img: 1389 MB, 1389363200 bytes, 2713600 sectors</div><div class="line">Units = sectors of 1 * 512 = 512 bytes</div><div class="line">Sector size (logical/physical): 512 bytes / 512 bytes</div><div class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</div><div class="line">Disk label type: dos</div><div class="line">Disk identifier: 0x5a7089a1</div><div class="line"></div><div class="line">                                Device Boot      Start         End      Blocks   Id  System</div><div class="line">./2016-09-23-raspbian-jessie-lite.img1            8192      137215       64512    c  W95 FAT32 (LBA)</div><div class="line">./2016-09-23-raspbian-jessie-lite.img2          137216     2713599     1288192   83  Linux</div></pre></td></tr></table></figure>
+</code></pre><p>Two partitions are listed here, and the second one is the root fs of Raspbian.</p>
+<h2 id="Mount-the-img-using-loop-device"><a href="#Mount-the-img-using-loop-device" class="headerlink" title="Mount the img using loop device"></a>Mount the img using loop device</h2><pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[blah@localhost ~]$ sudo losetup -Pr /dev/loop0 2016-09-23-raspbian-jessie-lite.img</div><div class="line">[blah@localhost ~]$ ls /dev/loop0*</div><div class="line">/dev/loop0  /dev/loop0p1  /dev/loop0p2</div><div class="line">[blah@localhost ~]$ mkdir rpi</div><div class="line">[blah@localhost ~]$ sudo mount -o ro /dev/loop0p2 ./rpi</div></pre></td></tr></table></figure>
+</code></pre><p>When I list file under rpi directory, I should see all files to root of Raspbian. </p>
+<h2 id="Archive-the-filesystem-to-tarball"><a href="#Archive-the-filesystem-to-tarball" class="headerlink" title="Archive the filesystem to tarball"></a>Archive the filesystem to tarball</h2><p>Next, I will archive the whole Raspbian file system to a tarball archive to import into Docker image.</p>
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo tar -C ./rpi -czpf 2016-09-23-raspbian-jessie-lite.tar.gz --numeric-owner .</div></pre></td></tr></table></figure>
+</code></pre><p>This will generate <code>2016-09-23-raspbian-jessie-lite.tar.gz</code> under current folder, and preserving all permissions with numeric owner id. I can view the files inside tarball using:</p>
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tar --numeric-owner -tvzf 2016-09-23-raspbian-jessie-lite.tar.gz</div></pre></td></tr></table></figure>
+</code></pre><p>And, unmount the devices.</p>
+<pre><code><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo umount ./rpi</div><div class="line">sudo losetup <span class="_">-d</span> /dev/loop0</div></pre></td></tr></table></figure>
+</code></pre><h1 id="Create-Dockerfile"><a href="#Create-Dockerfile" class="headerlink" title="Create Dockerfile"></a>Create Dockerfile</h1><p>Now, I can upload the tarball file into Raspberry Pi and create my Docker image. Below is my Dockerfile, and I put <code>2016-09-23-raspbian-jessie-lite.tar.gz</code> in the same directory besides Dockerfile.</p>
+<pre><code><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">FROM</span> scratch</div><div class="line"><span class="keyword">ADD</span><span class="bash"> ./2016-09-23-raspbian-jessie-lite.tar.gz /</span></div><div class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">"/bin/bash"</span>]</span></div></pre></td></tr></table></figure>
+</code></pre><p>Then, I’m just one step away from finish.</p>
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">➜  blah@raspberrypi:raspbian git:(master)✗ $ docker build -t blah .</div><div class="line">Sending build context to Docker daemon 290.8 MB</div><div class="line">Step 1 : FROM scratch</div><div class="line"> ---&gt;</div><div class="line">Step 2 : ADD ./2016-09-23-raspbian-jessie-lite.tar.gz /</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; f22314f2ba29</div><div class="line">Step 3 : CMD /bin/bash</div><div class="line"> ---&gt; Using cache</div><div class="line"> ---&gt; 86f8965d6316</div><div class="line">Successfully built 86f8965d6316</div></pre></td></tr></table></figure>
+</code></pre><p>Voilà, it’s done! The only drawback is size of image. Seems Raspbian shipped with lots of extra packages, the image I created is 694.4 MB.</p>
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">➜  blah@raspberrypi:raspbian git:(master)✗ $ docker run -it blah</div><div class="line">root@a6318807be9d:/# echo &quot;hello-world&quot;</div><div class="line">hello-world</div><div class="line">root@a6318807be9d:/#</div></pre></td></tr></table></figure>
+</code></pre><h1 id="Docker-Hub"><a href="#Docker-Hub" class="headerlink" title="Docker Hub"></a>Docker Hub</h1><p>I have pushed it to Docker Hub, if you want to use mine, you can use <a href="https://hub.docker.com/r/guoyiang/raspbian/" title="guoyiang/raspbian" target="_blank" rel="external">guoyiang/raspbian</a> . But I guess you would prefer build your own :)</p>
+<p>I also found an interesting Docker repository which has some armhf images to use: <a href="https://hub.docker.com/u/armhf/" title="armhf" target="_blank" rel="external">armhf</a>. Well, Docker/Raspberry Pi Foundation, please provide us some official images.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;It’s great to have Docker on Raspberry Pi, and there’s a &lt;a href=&quot;https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/&quot; title=&quot;Raspberry Pi&amp;#39;s blog about Docker&quot;&gt;blog&lt;/a&gt; about it.&lt;/p&gt;
+&lt;p&gt;But one thing I found is that Raspberry Pi is based on ARM CPU, thus do not support x86/x64 instructions. &lt;strong&gt;Any Docker image build for x86/x64 won’t work&lt;/strong&gt;. And, I didn’t find any &lt;strong&gt;official&lt;/strong&gt; Docker image built for Raspberry Pi. &lt;a href=&quot;https://hub.docker.com/r/resin/rpi-raspbian/&quot; title=&quot;resin/rpi-raspbian&quot;&gt;resin/rpi-raspbian&lt;/a&gt; is widely used and also used by &lt;a href=&quot;https://github.com/docker/docker/blob/master/contrib/builder/deb/armhf/raspbian-jessie/Dockerfile&quot; title=&quot;Resin Docker image used in Docker project&quot;&gt;Docker&lt;/a&gt; project is a good candidate and is lightweitht, but I still want to use an official one. So, I decided to build one myself.&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="Docker" scheme="http://guoyiang.com/tags/Docker/"/>
+    
+      <category term="Raspberry Pi" scheme="http://guoyiang.com/tags/Raspberry-Pi/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://guoyiang.com/1970/01/01/hello-world/"/>
+    <id>http://guoyiang.com/1970/01/01/hello-world/</id>
+    <published>1970-01-01T00:00:00.000Z</published>
+    <updated>2016-11-06T04:01:39.066Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
