@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://guoyiang.com/"/>
-  <updated>2016-11-06T04:01:39.066Z</updated>
+  <updated>2016-11-06T22:30:19.735Z</updated>
   <id>http://guoyiang.com/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://guoyiang.com/2016/11/04/Build-My-Own-Raspbian-Docker-Image/"/>
     <id>http://guoyiang.com/2016/11/04/Build-My-Own-Raspbian-Docker-Image/</id>
     <published>2016-11-04T21:59:58.000Z</published>
-    <updated>2016-11-06T04:01:39.066Z</updated>
+    <updated>2016-11-06T22:30:19.735Z</updated>
     
     <content type="html"><![CDATA[<p>It’s great to have Docker on Raspberry Pi, and there’s a <a href="https://www.raspberrypi.org/blog/docker-comes-to-raspberry-pi/" title="Raspberry Pi&#39;s blog about Docker" target="_blank" rel="external">blog</a> about it.</p>
 <p>But one thing I found is that Raspberry Pi is based on ARM CPU, thus do not support x86/x64 instructions. <strong>Any Docker image build for x86/x64 won’t work</strong>. And, I didn’t find any <strong>official</strong> Docker image built for Raspberry Pi. <a href="https://hub.docker.com/r/resin/rpi-raspbian/" title="resin/rpi-raspbian" target="_blank" rel="external">resin/rpi-raspbian</a> is widely used and also used by <a href="https://github.com/docker/docker/blob/master/contrib/builder/deb/armhf/raspbian-jessie/Dockerfile" title="Resin Docker image used in Docker project" target="_blank" rel="external">Docker</a> project is a good candidate and is lightweitht, but I still want to use an official one. So, I decided to build one myself.<br><a id="more"></a></p>
@@ -65,7 +65,7 @@
     <link href="http://guoyiang.com/1970/01/01/hello-world/"/>
     <id>http://guoyiang.com/1970/01/01/hello-world/</id>
     <published>1970-01-01T00:00:00.000Z</published>
-    <updated>2016-11-06T04:01:39.066Z</updated>
+    <updated>2016-11-06T22:30:19.735Z</updated>
     
     <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
