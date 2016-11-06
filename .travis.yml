@@ -1,8 +1,5 @@
 language: node_js
 
-node_js:
-  - '4'
-
 sudo: false
 
 branches:
@@ -29,7 +26,4 @@ install:
 
 script:
   - hexo clean
-  - hexo g
-
-deploy:
   - hexo g -d
