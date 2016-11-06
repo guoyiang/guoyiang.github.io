@@ -74,6 +74,7 @@ deploy:
   type: git
   repo: git@github.com:guoyiang/guoyiang.github.io.git
   branch: master
+  keep_hidden_file: true
 
 google_analytics: UA-20608358-3
 
