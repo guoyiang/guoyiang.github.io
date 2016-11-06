@@ -28,4 +28,5 @@ install:
 
 script:
   - hexo clean
+  - git clone https://github.com/guoyiang/guoyiang.github.io.git .deploy_git
   - hexo g -d
