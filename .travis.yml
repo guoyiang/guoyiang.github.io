@@ -4,11 +4,4 @@ sudo: false
 
 branches:
   only:
-  - master
   - source
-
-node_js:
-  - "6"
-
-script:
-  - echo 'SUCCESS'
