@@ -4,7 +4,7 @@ sudo: false
 
 branches:
   only:
-  - master
+  - source
 
 node_js:
   - "6"
@@ -28,5 +28,5 @@ install:
 
 script:
   - hexo clean
-  - git clone https://github.com/guoyiang/guoyiang.github.io.git .deploy_git
+  - git clone -b master git@github.com:guoyiang/guoyiang.github.io.git .deploy_git
   - hexo g -d
