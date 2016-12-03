@@ -26,7 +26,15 @@ install:
   - npm install hexo-cli -g
   - npm install
 
-script:
+before_script:
   - hexo clean
+
+script:
+  - hexo generate
+
+after_success:
+  # Copy README.md to generated site
+  - cp README.md public/README.md
+  # Clone github-pages repository into deploy directory to keep history
   - git clone -b master git@github.com:guoyiang/guoyiang.github.io.git .deploy_git
-  - hexo g -d
+  - hexo deploy
