@@ -5,6 +5,6 @@
 
 Files for [guoyiang.github.io](http://www.guoyiang.com).
 
-`master` branch has published files.
+`master` branch - Hexo published site.
 
-Check `source` branch contains Hexo source files.
+`source` branch - Hexo source files.
