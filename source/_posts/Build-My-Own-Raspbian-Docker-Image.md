@@ -8,6 +8,12 @@ tags:
 
 It's great to have Docker on Raspberry Pi, and there's a [blog][RPi-Docker-Blog] about it.
 
+# Update 2021
+
+After so many years, the ecosystem has evolved a lot. Docker supports [multi-CPU architecture](https://docs.docker.com/desktop/multi-arch/) so does many images, e.g. [alpine](https://hub.docker.com/_/alpine). It's no longer needed to do those complex steps by yourself.
+
+# Previous Blog
+
 But one thing I found is that Raspberry Pi is based on ARM CPU, thus do not support x86/x64 instructions. **Any Docker image build for x86/x64 won't work**. And, I didn't find any **official** Docker image built for Raspberry Pi. [resin/rpi-raspbian][Resin-Docker] is widely used and also used by [Docker][Resin-Used-in-Docker] project is a good candidate and is lightweitht, but I still want to use an official one. So, I decided to build one myself.
 <!--more-->
 
