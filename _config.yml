@@ -8,7 +8,10 @@ subtitle:
 description:
 author: Yiang Guo
 avatar: /images/Avatar.jpg
-language: en
+language: 
+  - en
+  - zh-CN
+language_switcher: true
 timezone:
 
 # URL
@@ -73,7 +76,7 @@ theme: next
 deploy:
   type: git
   repo: git@github.com:guoyiang/guoyiang.github.io.git
-  branch: master
+  branch: gh-pages
   keep_hidden_file: true
 
 google_analytics: UA-20608358-3
